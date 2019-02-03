@@ -1,3 +1,4 @@
+
 import cv2
 import numpy as np
 
@@ -8,7 +9,7 @@ NUM_CHESSBOARD_COL_CORNERS = 8
 # These indices correspond to the available cameras on a given computer. It is 
 # not known how to request a specific camera by name or other method  besides 
 # its index.
-CAMERA_DEVICE_INDEX = 1
+CAMERA_DEVICE_INDEX = 0
 
 CAMERA_CALIBRATION_DIRECTORY = 'logitech-quickcam-pro-9000-calibration'
 
@@ -49,20 +50,35 @@ while(True):
             yRotation = rotationMatrix[0, 2]
             zRotation = rotationMatrix[1, 0]
             xyzRotationVector = [xRotation, yRotation, zRotation]
-    
+
             print('Rotation vector: {}\nTranslation vector: {}'.format(xyzRotationVector, translationVector.T))
-            
+
             visualizationImg = np.ones_like(bgrImg) * 255
             visWidthPx, visHeightPx, _ = visualizationImg.shape
 
-            visualizationImg = cv2.putText(visualizationImg, 'Z translation: {:.3f} inches'.format(translationVector[2][0]), \
-                                           (int(visWidthPx * 1 / 32), int(visHeightPx * 2 / 32)), \
-                                           cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 0))
+            fontScale = 1
+            fontColorBlack = (0, 0, 0)
+
+            barColorGreen = (0, 255, 0)
+
+            leftColumnXPositionPx = int(visWidthPx * 1 / 32)
+
+            zTranslationInches = translationVector[2][0]
+            zTranslationLabel = 'Z translation: {:.3f} inches'.format(zTranslationInches)
+            zTranslationTextYBaselinePx = int(visHeightPx * 2 / 32)
+            visualizationImg = cv2.putText(visualizationImg, zTranslationLabel, \
+                                           (leftColumnXPositionPx, zTranslationTextYBaselinePx), \
+                                           cv2.FONT_HERSHEY_DUPLEX, fontScale, fontColorBlack)
+
+            zTranslationBarWidthPx = int(zTranslationInches / 100 * visWidthPx * 15 / 32)
+            zTranslationBarYStartPositionPx = int(visHeightPx * 3 / 32)
+            zTranslationBarYEndPositionPx   = int(visHeightPx * 4 / 32)
+
             visualizationImg = \
                 cv2.rectangle(visualizationImg, \
-                              (int(visWidthPx * 1 / 32), int(visHeightPx * 3 / 32)), \
-                              (int(visWidthPx * 1 / 32 + translationVector[2] * 10), int(visHeightPx * 4 / 32)), \
-                              [0, 255, 0], cv2.FILLED)
+                              (leftColumnXPositionPx, zTranslationBarYStartPositionPx), \
+                              (leftColumnXPositionPx + zTranslationBarWidthPx, zTranslationBarYEndPositionPx), \
+                              barColorGreen, cv2.FILLED)
             
             cv2.imshow('vis', cv2.resize(visualizationImg, None, fx = 0.5, fy = 0.5))
 
