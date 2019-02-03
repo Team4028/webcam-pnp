@@ -42,8 +42,15 @@ while(True):
                 cv2.solvePnP(chessboardPoints3dList, chessboardCorner2dList, cameraMatrix, distortionCoefficients)
     
             assert idkSomeReturnValue
+
+            # See opencv docs for Rodrigues for formatting of rotation matrix
+            rotationMatrix, _ = cv2.Rodrigues(rotationVector)
+            xRotation = rotationMatrix[2, 1]
+            yRotation = rotationMatrix[0, 2]
+            zRotation = rotationMatrix[1, 0]
+            xyzRotationVector = [xRotation, yRotation, zRotation]
     
-            print('Rotation vector: {}\nTranslation vector: {}'.format(rotationVector.T, translationVector.T))    
+            print('Rotation vector: {}\nTranslation vector: {}'.format(xyzRotationVector, translationVector.T))
 
         cv2.drawChessboardCorners(bgrImg, numChessboardCornersPair, chessboardCorner2dList, isChessboardFoundInImg)
         cv2.imshow('img', cv2.resize(bgrImg, None, fx = 0.5, fy = 0.5))
