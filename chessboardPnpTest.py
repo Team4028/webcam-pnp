@@ -51,11 +51,25 @@ while(True):
             xyzRotationVector = [xRotation, yRotation, zRotation]
     
             print('Rotation vector: {}\nTranslation vector: {}'.format(xyzRotationVector, translationVector.T))
+            
+            visualizationImg = np.ones_like(bgrImg) * 255
+            visWidthPx, visHeightPx, _ = visualizationImg.shape
+
+            visualizationImg = cv2.putText(visualizationImg, 'Z translation: {:.3f} inches'.format(translationVector[2][0]), \
+                                           (int(visWidthPx * 1 / 32), int(visHeightPx * 2 / 32)), \
+                                           cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 0))
+            visualizationImg = \
+                cv2.rectangle(visualizationImg, \
+                              (int(visWidthPx * 1 / 32), int(visHeightPx * 3 / 32)), \
+                              (int(visWidthPx * 1 / 32 + translationVector[2] * 10), int(visHeightPx * 4 / 32)), \
+                              [0, 255, 0], cv2.FILLED)
+            
+            cv2.imshow('vis', cv2.resize(visualizationImg, None, fx = 0.5, fy = 0.5))
 
         cv2.drawChessboardCorners(bgrImg, numChessboardCornersPair, chessboardCorner2dList, isChessboardFoundInImg)
         cv2.imshow('img', cv2.resize(bgrImg, None, fx = 0.5, fy = 0.5))
 
-        keyPressed = cv2.waitKey(1)
+        keyPressed = cv2.waitKey(20)
 
         isQuitKeyPressed = keyPressed & 0xFF == ord('q')
         if isQuitKeyPressed:
