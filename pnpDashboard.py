@@ -89,7 +89,7 @@ def drawPnpDashboard(translationVector, rotationVector):
     zTranslationMeterWidthPx = int(METRIC_BAR_WIDTH_PX * min(1.0, zTranslationFraction))
     zTranslationMeterBottomRight = (firstMetricColumnLeftPx + zTranslationMeterWidthPx, \
                                     thirdMetricRowBottomPx)
-    zTranslationAmountString = str(zTranslationInches) + '"'
+    zTranslationAmountString = '{:.2f}"'.format(zTranslationInches)
     zTranslationAmountTextAnchor = (175, thirdMetricRowLabelPx)
 
     cv2.rectangle(img, zTranslationBarTopLeft, zTranslationBarBottomRight, WHITE_COLOR, -1)
@@ -165,7 +165,6 @@ def drawPnpDashboard(translationVector, rotationVector):
     cv2.rectangle(img, angle2BarTopLeft, angle2BarBottomRight, BLACK_COLOR)
 
     cv2.imshow('dashboard', img)
-    cv2.waitKey(0)
 
     
 
@@ -174,3 +173,4 @@ if __name__ == '__main__':
     rotationVector = [-30.2, 5.7, -9.7]
 
     drawPnpDashboard(translationVector, rotationVector)
+    cv2.waitKey(0)
