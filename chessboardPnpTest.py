@@ -2,6 +2,7 @@
 import cv2
 import numpy as np
 
+import pnpDashboard
 
 NUM_CHESSBOARD_ROW_CORNERS = 5
 NUM_CHESSBOARD_COL_CORNERS = 8
@@ -41,6 +42,9 @@ while(True):
         if isChessboardFoundInImg:
             idkSomeReturnValue, rotationVector, translationVector = \
                 cv2.solvePnP(chessboardPoints3dList, chessboardCorner2dList, cameraMatrix, distortionCoefficients)
+
+            rotationVector    = rotationVector.squeeze()
+            translationVector = translationVector.squeeze()
     
             assert idkSomeReturnValue
 
@@ -51,36 +55,8 @@ while(True):
             zRotation = rotationMatrix[1, 0]
             xyzRotationVector = [xRotation, yRotation, zRotation]
 
+            pnpDashboard.drawPnpDashboard(translationVector, rotationVector)
             print('Rotation vector: {}\nTranslation vector: {}'.format(xyzRotationVector, translationVector.T))
-
-            visualizationImg = np.ones_like(bgrImg) * 255
-            visWidthPx, visHeightPx, _ = visualizationImg.shape
-
-            fontScale = 1
-            fontColorBlack = (0, 0, 0)
-
-            barColorGreen = (0, 255, 0)
-
-            leftColumnXPositionPx = int(visWidthPx * 1 / 32)
-
-            zTranslationInches = translationVector[2][0]
-            zTranslationLabel = 'Z translation: {:.3f} inches'.format(zTranslationInches)
-            zTranslationTextYBaselinePx = int(visHeightPx * 2 / 32)
-            visualizationImg = cv2.putText(visualizationImg, zTranslationLabel, \
-                                           (leftColumnXPositionPx, zTranslationTextYBaselinePx), \
-                                           cv2.FONT_HERSHEY_DUPLEX, fontScale, fontColorBlack)
-
-            zTranslationBarWidthPx = int(zTranslationInches / 100 * visWidthPx * 15 / 32)
-            zTranslationBarYStartPositionPx = int(visHeightPx * 3 / 32)
-            zTranslationBarYEndPositionPx   = int(visHeightPx * 4 / 32)
-
-            visualizationImg = \
-                cv2.rectangle(visualizationImg, \
-                              (leftColumnXPositionPx, zTranslationBarYStartPositionPx), \
-                              (leftColumnXPositionPx + zTranslationBarWidthPx, zTranslationBarYEndPositionPx), \
-                              barColorGreen, cv2.FILLED)
-            
-            cv2.imshow('vis', cv2.resize(visualizationImg, None, fx = 0.5, fy = 0.5))
 
         cv2.drawChessboardCorners(bgrImg, numChessboardCornersPair, chessboardCorner2dList, isChessboardFoundInImg)
         cv2.imshow('img', cv2.resize(bgrImg, None, fx = 0.5, fy = 0.5))
