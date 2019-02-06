@@ -1,21 +1,36 @@
 import cv2
 import numpy as np
 
+
+DASHBOARD_HEIGHT_PX = 325
+DASHBOARD_WIDTH_PX  = 825
+
+Z_TRANSLATION_MAX_INCHES = 180
+
+BLACK_COLOR = (  0,   0,   0)
+BLUE_COLOR  = (255, 231,  92)
+GRAY_COLOR  = (246, 246, 246)
+WHITE_COLOR = (255, 255, 255)
+
+FONT_SCALE = 1
+
+METRIC_BAR_WIDTH_PX  = 200
+METRIC_BAR_HEIGHT_PX =  25
+
+
+def drawUnipolarMeter(img, metric, metricLimit, topLeft):
+    metricFraction = metric / metricLimit
+    meterWidthPx = int(METRIC_BAR_WIDTH_PX * min(1.0, metricFraction))
+
+    meterBottomRight = (topLeft[0] + meterWidthPx, topLeft[1] + METRIC_BAR_HEIGHT_PX)
+    barBottomRight   = (topLeft[0] + METRIC_BAR_WIDTH_PX, topLeft[1] + METRIC_BAR_HEIGHT_PX)
+
+    cv2.rectangle(img, topLeft, barBottomRight,   WHITE_COLOR, -1)
+    cv2.rectangle(img, topLeft, meterBottomRight, BLUE_COLOR,  -1)
+    cv2.rectangle(img, topLeft, barBottomRight,   BLACK_COLOR)
+
+
 def drawPnpDashboard(translationVector, rotationVector):
-    DASHBOARD_HEIGHT_PX = 325
-    DASHBOARD_WIDTH_PX  = 825
-
-    Z_TRANSLATION_MAX_INCHES = 180
-
-    BLACK_COLOR = (  0,   0,   0)
-    BLUE_COLOR  = (255, 231,  92)
-    GRAY_COLOR  = (246, 246, 246)
-    WHITE_COLOR = (255, 255, 255)
-
-    FONT_SCALE = 1
-
-    METRIC_BAR_WIDTH_PX = 200
-
     # TODO: calculate the game metrics
 
     dashboardSize = (DASHBOARD_HEIGHT_PX, DASHBOARD_WIDTH_PX, 3)
@@ -81,20 +96,14 @@ def drawPnpDashboard(translationVector, rotationVector):
 
     # Draw Z translation section
     zTranslationBarTopLeft     = (firstMetricColumnLeftPx,  thirdMetricRowTopPx)
-    zTranslationBarBottomRight = (firstMetricColumnRightPx, thirdMetricRowBottomPx)
     zTranslationLabelTextAnchor = (firstMetricColumnLeftPx, thirdMetricRowLabelPx)
-
     zTranslationInches = translationVector[2]
-    zTranslationFraction = zTranslationInches / Z_TRANSLATION_MAX_INCHES
-    zTranslationMeterWidthPx = int(METRIC_BAR_WIDTH_PX * min(1.0, zTranslationFraction))
-    zTranslationMeterBottomRight = (firstMetricColumnLeftPx + zTranslationMeterWidthPx, \
-                                    thirdMetricRowBottomPx)
+
+    drawUnipolarMeter(img, zTranslationInches, Z_TRANSLATION_MAX_INCHES, zTranslationBarTopLeft)
+
     zTranslationAmountString = '{:.2f}"'.format(zTranslationInches)
     zTranslationAmountTextAnchor = (175, thirdMetricRowLabelPx)
 
-    cv2.rectangle(img, zTranslationBarTopLeft, zTranslationBarBottomRight, WHITE_COLOR, -1)
-    cv2.rectangle(img, zTranslationBarTopLeft, zTranslationMeterBottomRight, BLUE_COLOR, -1)
-    cv2.rectangle(img, zTranslationBarTopLeft, zTranslationBarBottomRight, BLACK_COLOR)
     cv2.putText(img, 'Z translation:', zTranslationLabelTextAnchor, cv2.FONT_HERSHEY_PLAIN, \
                 FONT_SCALE, BLACK_COLOR)
     cv2.putText(img, zTranslationAmountString, zTranslationAmountTextAnchor, cv2.FONT_HERSHEY_PLAIN, \
