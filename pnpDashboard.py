@@ -1,4 +1,5 @@
 import cv2
+import math
 import numpy as np
 
 
@@ -6,6 +7,8 @@ DASHBOARD_HEIGHT_PX = 325
 DASHBOARD_WIDTH_PX  = 825
 
 Z_TRANSLATION_MAX_INCHES = 180
+
+XZ_DISTANCE_MAX_INCHES   = 180
 
 BLACK_COLOR = (  0,   0,   0)
 BLUE_COLOR  = (255, 231,  92)
@@ -38,7 +41,12 @@ def drawAmountLabel(img, metric, anchor):
 
 
 def drawPnpDashboard(translationVector, rotationVector):
+    xTranslationInches = translationVector[0]
+    yTranslationInches = translationVector[1]
+    zTranslationInches = translationVector[2]
+
     # TODO: calculate the game metrics
+    xzDistanceInches = math.sqrt(xTranslationInches**2 + zTranslationInches**2)
 
     dashboardSize = (DASHBOARD_HEIGHT_PX, DASHBOARD_WIDTH_PX, 3)
     img = np.ones(dashboardSize, dtype=np.uint8) * 255
@@ -105,7 +113,6 @@ def drawPnpDashboard(translationVector, rotationVector):
     zTranslationBarTopLeft     = (firstMetricColumnLeftPx,  thirdMetricRowTopPx)
     zTranslationLabelTextAnchor = (firstMetricColumnLeftPx, thirdMetricRowLabelPx)
     zTranslationAmountTextAnchor = (175, thirdMetricRowLabelPx)
-    zTranslationInches = translationVector[2]
 
     drawUnipolarMeter(img, zTranslationInches, Z_TRANSLATION_MAX_INCHES, zTranslationBarTopLeft)
     drawMetricLabel(img, 'Z translation:', zTranslationLabelTextAnchor)
@@ -159,9 +166,12 @@ def drawPnpDashboard(translationVector, rotationVector):
 
     # Draw XZ distance section
     xzDistanceBarTopLeft     = (thirdMetricColumnLeftPx,  firstMetricRowTopPx)
-    xzDistanceBarBottomRight = (thirdMetricColumnRightPx, firstMetricRowBottomPx)
-    cv2.rectangle(img, xzDistanceBarTopLeft, xzDistanceBarBottomRight, WHITE_COLOR, -1)
-    cv2.rectangle(img, xzDistanceBarTopLeft, xzDistanceBarBottomRight, BLACK_COLOR)
+    xzDistanceLabelTextAnchor = (thirdMetricColumnLeftPx, firstMetricRowLabelPx)
+    xzDistanceAmountTextAnchor = (687, firstMetricRowLabelPx)
+
+    drawUnipolarMeter(img, xzDistanceInches, XZ_DISTANCE_MAX_INCHES, xzDistanceBarTopLeft)
+    drawMetricLabel(img, 'XZ distance:', xzDistanceLabelTextAnchor)
+    drawAmountLabel(img, xzDistanceInches, xzDistanceAmountTextAnchor)
 
     # Draw angle 1 section
     angle1BarTopLeft     = (thirdMetricColumnLeftPx,  secondMetricRowTopPx)
