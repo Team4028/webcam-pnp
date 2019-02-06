@@ -6,6 +6,8 @@ import numpy as np
 DASHBOARD_HEIGHT_PX = 325
 DASHBOARD_WIDTH_PX  = 825
 
+X_TRANSLATION_MAX_INCHES =  48
+Y_TRANSLATION_MAX_INCHES =  48
 Z_TRANSLATION_MAX_INCHES = 180
 
 XZ_DISTANCE_MAX_INCHES   = 180
@@ -20,6 +22,22 @@ FONT_SCALE = 1
 METRIC_BAR_WIDTH_PX  = 200
 METRIC_BAR_HEIGHT_PX =  25
 
+
+def drawBipolarMeter(img, metric, metricLimit, topLeft):
+    metricFraction = metric / metricLimit
+    meterWidthPx = int(METRIC_BAR_WIDTH_PX / 2 * min(1.0, metricFraction))
+    barHalfWidthPx = int(METRIC_BAR_WIDTH_PX / 2)
+
+    barTopCenter    = (topLeft[0] + barHalfWidthPx, topLeft[1])
+    barBottomCenter = (topLeft[0] + barHalfWidthPx, topLeft[1] + METRIC_BAR_HEIGHT_PX)
+    barBottomRight   = (topLeft[0] + METRIC_BAR_WIDTH_PX, topLeft[1] + METRIC_BAR_HEIGHT_PX)
+
+    meterBottomRight = (barBottomCenter[0] + meterWidthPx, barBottomCenter[1])
+
+    cv2.rectangle(img, topLeft, barBottomRight,   WHITE_COLOR, -1)
+    cv2.rectangle(img, barTopCenter, meterBottomRight, BLUE_COLOR,  -1)
+    cv2.rectangle(img, topLeft, barBottomRight,   BLACK_COLOR)
+    cv2.line(img, barTopCenter, barBottomCenter, BLACK_COLOR)
 
 def drawUnipolarMeter(img, metric, metricLimit, topLeft):
     metricFraction = metric / metricLimit
@@ -87,15 +105,12 @@ def drawPnpDashboard(translationVector, rotationVector):
 
     # Draw X translation section
     xTranslationBarTopLeft      = (firstMetricColumnLeftPx,   firstMetricRowTopPx)
-    xTranslationBarBottomRight  = (firstMetricColumnRightPx,  firstMetricRowBottomPx)
-    xTranslationBarTopCenter    = (firstMetricColumnCenterPx, firstMetricRowTopPx)
-    xTranslationBarBottomCenter = (firstMetricColumnCenterPx, firstMetricRowBottomPx)
     xTranslationLabelTextAnchor = (firstMetricColumnLeftPx,   firstMetricRowLabelPx)
-    cv2.rectangle(img, xTranslationBarTopLeft, xTranslationBarBottomRight, WHITE_COLOR, -1)
-    cv2.rectangle(img, xTranslationBarTopLeft, xTranslationBarBottomRight, BLACK_COLOR)
-    cv2.line(img, xTranslationBarTopCenter, xTranslationBarBottomCenter, BLACK_COLOR)
-    cv2.putText(img, 'X translation:', xTranslationLabelTextAnchor, cv2.FONT_HERSHEY_PLAIN, \
-                FONT_SCALE, BLACK_COLOR)
+    xTranslationAmountTextAnchor = (175, firstMetricRowLabelPx)
+
+    drawBipolarMeter(img, xTranslationInches, X_TRANSLATION_MAX_INCHES, xTranslationBarTopLeft)
+    drawMetricLabel(img, 'X translation:', xTranslationLabelTextAnchor)
+    drawAmountLabel(img, xTranslationInches, xTranslationAmountTextAnchor)
 
     # Draw Y translation section
     yTranslationBarTopLeft     = (firstMetricColumnLeftPx,  secondMetricRowTopPx)
