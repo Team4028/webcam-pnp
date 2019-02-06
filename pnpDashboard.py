@@ -29,6 +29,13 @@ def drawUnipolarMeter(img, metric, metricLimit, topLeft):
     cv2.rectangle(img, topLeft, meterBottomRight, BLUE_COLOR,  -1)
     cv2.rectangle(img, topLeft, barBottomRight,   BLACK_COLOR)
 
+def drawMetricLabel(img, labelString, anchor):
+    cv2.putText(img, labelString, anchor, cv2.FONT_HERSHEY_PLAIN, FONT_SCALE, BLACK_COLOR)
+
+def drawAmountLabel(img, metric, anchor):
+    amountString = '{:.2f}"'.format(metric)
+    cv2.putText(img, amountString, anchor, cv2.FONT_HERSHEY_PLAIN, FONT_SCALE, BLACK_COLOR)
+
 
 def drawPnpDashboard(translationVector, rotationVector):
     # TODO: calculate the game metrics
@@ -97,17 +104,12 @@ def drawPnpDashboard(translationVector, rotationVector):
     # Draw Z translation section
     zTranslationBarTopLeft     = (firstMetricColumnLeftPx,  thirdMetricRowTopPx)
     zTranslationLabelTextAnchor = (firstMetricColumnLeftPx, thirdMetricRowLabelPx)
+    zTranslationAmountTextAnchor = (175, thirdMetricRowLabelPx)
     zTranslationInches = translationVector[2]
 
     drawUnipolarMeter(img, zTranslationInches, Z_TRANSLATION_MAX_INCHES, zTranslationBarTopLeft)
-
-    zTranslationAmountString = '{:.2f}"'.format(zTranslationInches)
-    zTranslationAmountTextAnchor = (175, thirdMetricRowLabelPx)
-
-    cv2.putText(img, 'Z translation:', zTranslationLabelTextAnchor, cv2.FONT_HERSHEY_PLAIN, \
-                FONT_SCALE, BLACK_COLOR)
-    cv2.putText(img, zTranslationAmountString, zTranslationAmountTextAnchor, cv2.FONT_HERSHEY_PLAIN, \
-                FONT_SCALE, BLACK_COLOR)
+    drawMetricLabel(img, 'Z translation:', zTranslationLabelTextAnchor)
+    drawAmountLabel(img, zTranslationInches, zTranslationAmountTextAnchor)
 
     # Draw X rotation section
     xRotationBarTopLeft     = (secondMetricColumnLeftPx,  firstMetricRowTopPx)
