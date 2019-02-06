@@ -10,7 +10,11 @@ X_TRANSLATION_MAX_INCHES =  48
 Y_TRANSLATION_MAX_INCHES =  48
 Z_TRANSLATION_MAX_INCHES = 180
 
-XZ_DISTANCE_MAX_INCHES   = 180
+X_ROTATION_MAX_DEGREES = 90
+Y_ROTATION_MAX_DEGREES = 90
+Z_ROTATION_MAX_DEGREES = 90
+
+XZ_DISTANCE_MAX_INCHES = 180
 
 BLACK_COLOR = (  0,   0,   0)
 BLUE_COLOR  = (255, 231,  92)
@@ -53,8 +57,8 @@ def drawUnipolarMeter(img, metric, metricLimit, topLeft):
 def drawMetricLabel(img, labelString, anchor):
     cv2.putText(img, labelString, anchor, cv2.FONT_HERSHEY_PLAIN, FONT_SCALE, BLACK_COLOR)
 
-def drawAmountLabel(img, metric, anchor):
-    amountString = '{:.2f}"'.format(metric)
+def drawAmountLabel(img, metric, anchor, unitString):
+    amountString = '{:.2f}{}'.format(metric, unitString)
     cv2.putText(img, amountString, anchor, cv2.FONT_HERSHEY_PLAIN, FONT_SCALE, BLACK_COLOR)
 
 
@@ -62,6 +66,14 @@ def drawPnpDashboard(translationVector, rotationVector):
     xTranslationInches = translationVector[0]
     yTranslationInches = translationVector[1]
     zTranslationInches = translationVector[2]
+
+    xRotationRadians = rotationVector[0]
+    yRotationRadians = rotationVector[1]
+    zRotationRadians = rotationVector[2]
+
+    xRotationDegrees = xRotationRadians * 180 / math.pi
+    yRotationDegrees = yRotationRadians * 180 / math.pi
+    zRotationDegrees = zRotationRadians * 180 / math.pi
 
     # TODO: calculate the game metrics
     xzDistanceInches = math.sqrt(xTranslationInches**2 + zTranslationInches**2)
@@ -81,27 +93,16 @@ def drawPnpDashboard(translationVector, rotationVector):
 
     firstMetricRowLabelPx      = 87
     firstMetricRowTopPx        = 100
-    firstMetricRowBottomPx     = 125
 
     secondMetricRowLabelPx     = 167
     secondMetricRowTopPx       = 175
-    secondMetricRowBottomPx    = 200
 
     thirdMetricRowLabelPx      = 237
     thirdMetricRowTopPx        = 250
-    thirdMetricRowBottomPx     = 275
 
     firstMetricColumnLeftPx    =  50
-    firstMetricColumnCenterPx  = 150
-    firstMetricColumnRightPx   = 250
-
     secondMetricColumnLeftPx   = 300
-    secondMetricColumnCenterPx = 400
-    secondMetricColumnRightPx  = 500
-
     thirdMetricColumnLeftPx    = 575
-    thirdMetricColumnCenterPx  = 675
-    thirdMetricColumnRightPx   = 775
 
     # Draw X translation section
     xTranslationBarTopLeft      = (firstMetricColumnLeftPx,   firstMetricRowTopPx)
@@ -110,19 +111,16 @@ def drawPnpDashboard(translationVector, rotationVector):
 
     drawBipolarMeter(img, xTranslationInches, X_TRANSLATION_MAX_INCHES, xTranslationBarTopLeft)
     drawMetricLabel(img, 'X translation:', xTranslationLabelTextAnchor)
-    drawAmountLabel(img, xTranslationInches, xTranslationAmountTextAnchor)
+    drawAmountLabel(img, xTranslationInches, xTranslationAmountTextAnchor, '"')
 
     # Draw Y translation section
     yTranslationBarTopLeft     = (firstMetricColumnLeftPx,  secondMetricRowTopPx)
-    yTranslationBarBottomRight = (firstMetricColumnRightPx, secondMetricRowBottomPx)
-    yTranslationBarTopCenter    = (firstMetricColumnCenterPx, secondMetricRowTopPx)
-    yTranslationBarBottomCenter = (firstMetricColumnCenterPx, secondMetricRowBottomPx)
     yTranslationLabelTextAnchor = (firstMetricColumnLeftPx,   secondMetricRowLabelPx)
-    cv2.rectangle(img, yTranslationBarTopLeft, yTranslationBarBottomRight, WHITE_COLOR, -1)
-    cv2.rectangle(img, yTranslationBarTopLeft, yTranslationBarBottomRight, BLACK_COLOR)
-    cv2.line(img, yTranslationBarTopCenter, yTranslationBarBottomCenter, BLACK_COLOR)
-    cv2.putText(img, 'Y translation:', yTranslationLabelTextAnchor, cv2.FONT_HERSHEY_PLAIN, \
-                FONT_SCALE, BLACK_COLOR)
+    yTranslationAmountTextAnchor = (175, secondMetricRowLabelPx)
+
+    drawBipolarMeter(img, yTranslationInches, Y_TRANSLATION_MAX_INCHES, yTranslationBarTopLeft)
+    drawMetricLabel(img, 'Y translation:', yTranslationLabelTextAnchor)
+    drawAmountLabel(img, yTranslationInches, yTranslationAmountTextAnchor, '"')
 
     # Draw Z translation section
     zTranslationBarTopLeft     = (firstMetricColumnLeftPx,  thirdMetricRowTopPx)
@@ -131,43 +129,34 @@ def drawPnpDashboard(translationVector, rotationVector):
 
     drawUnipolarMeter(img, zTranslationInches, Z_TRANSLATION_MAX_INCHES, zTranslationBarTopLeft)
     drawMetricLabel(img, 'Z translation:', zTranslationLabelTextAnchor)
-    drawAmountLabel(img, zTranslationInches, zTranslationAmountTextAnchor)
+    drawAmountLabel(img, zTranslationInches, zTranslationAmountTextAnchor, '"')
 
     # Draw X rotation section
     xRotationBarTopLeft     = (secondMetricColumnLeftPx,  firstMetricRowTopPx)
-    xRotationBarBottomRight = (secondMetricColumnRightPx, firstMetricRowBottomPx)
-    xRotationBarTopCenter    = (secondMetricColumnCenterPx, firstMetricRowTopPx)
-    xRotationBarBottomCenter = (secondMetricColumnCenterPx, firstMetricRowBottomPx)
     xRotationLabelTextAnchor = (secondMetricColumnLeftPx,   firstMetricRowLabelPx)
-    cv2.rectangle(img, xRotationBarTopLeft, xRotationBarBottomRight, WHITE_COLOR, -1)
-    cv2.rectangle(img, xRotationBarTopLeft, xRotationBarBottomRight, BLACK_COLOR)
-    cv2.line(img, xRotationBarTopCenter, xRotationBarBottomCenter, BLACK_COLOR)
-    cv2.putText(img, 'X rotation:', xRotationLabelTextAnchor, cv2.FONT_HERSHEY_PLAIN, \
-                FONT_SCALE, BLACK_COLOR)
+    xRotationAmountTextAnchor = (400, firstMetricRowLabelPx)
+
+    drawBipolarMeter(img, xRotationDegrees, X_ROTATION_MAX_DEGREES, xRotationBarTopLeft)
+    drawMetricLabel(img, 'X rotation:', xRotationLabelTextAnchor)
+    drawAmountLabel(img, xRotationDegrees, xRotationAmountTextAnchor, ' deg')
 
     # Draw Y rotation section
     yRotationBarTopLeft     = (secondMetricColumnLeftPx,  secondMetricRowTopPx)
-    yRotationBarBottomRight = (secondMetricColumnRightPx, secondMetricRowBottomPx)
-    yRotationBarTopCenter    = (secondMetricColumnCenterPx, secondMetricRowTopPx)
-    yRotationBarBottomCenter = (secondMetricColumnCenterPx, secondMetricRowBottomPx)
     yRotationLabelTextAnchor = (secondMetricColumnLeftPx,   secondMetricRowLabelPx)
-    cv2.rectangle(img, yRotationBarTopLeft, yRotationBarBottomRight, WHITE_COLOR, -1)
-    cv2.rectangle(img, yRotationBarTopLeft, yRotationBarBottomRight, BLACK_COLOR)
-    cv2.line(img, yRotationBarTopCenter, yRotationBarBottomCenter, BLACK_COLOR)
-    cv2.putText(img, 'Y rotation:', yRotationLabelTextAnchor, cv2.FONT_HERSHEY_PLAIN, \
-                FONT_SCALE, BLACK_COLOR)
+    yRotationAmountTextAnchor = (400, secondMetricRowLabelPx)
+
+    drawBipolarMeter(img, yRotationDegrees, Y_ROTATION_MAX_DEGREES, yRotationBarTopLeft)
+    drawMetricLabel(img, 'Y rotation:', yRotationLabelTextAnchor)
+    drawAmountLabel(img, yRotationDegrees, yRotationAmountTextAnchor, ' deg')
 
     # Draw Z rotation section
     zRotationBarTopLeft     = (secondMetricColumnLeftPx,  thirdMetricRowTopPx)
-    zRotationBarBottomRight = (secondMetricColumnRightPx, thirdMetricRowBottomPx)
-    zRotationBarTopCenter    = (secondMetricColumnCenterPx, thirdMetricRowTopPx)
-    zRotationBarBottomCenter = (secondMetricColumnCenterPx, thirdMetricRowBottomPx)
     zRotationLabelTextAnchor = (secondMetricColumnLeftPx,   thirdMetricRowLabelPx)
-    cv2.rectangle(img, zRotationBarTopLeft, zRotationBarBottomRight, WHITE_COLOR, -1)
-    cv2.rectangle(img, zRotationBarTopLeft, zRotationBarBottomRight, BLACK_COLOR)
-    cv2.line(img, zRotationBarTopCenter, zRotationBarBottomCenter, BLACK_COLOR)
-    cv2.putText(img, 'Z rotation:', zRotationLabelTextAnchor, cv2.FONT_HERSHEY_PLAIN, \
-                FONT_SCALE, BLACK_COLOR)
+    zRotationAmountTextAnchor = (400, thirdMetricRowLabelPx)
+
+    drawBipolarMeter(img, zRotationDegrees, Z_ROTATION_MAX_DEGREES, zRotationBarTopLeft)
+    drawMetricLabel(img, 'Z rotation:', zRotationLabelTextAnchor)
+    drawAmountLabel(img, zRotationDegrees, zRotationAmountTextAnchor, ' deg')
 
     # Game metrics area
     gameAreaTopLeft     = (550,  62)
@@ -186,19 +175,19 @@ def drawPnpDashboard(translationVector, rotationVector):
 
     drawUnipolarMeter(img, xzDistanceInches, XZ_DISTANCE_MAX_INCHES, xzDistanceBarTopLeft)
     drawMetricLabel(img, 'XZ distance:', xzDistanceLabelTextAnchor)
-    drawAmountLabel(img, xzDistanceInches, xzDistanceAmountTextAnchor)
+    drawAmountLabel(img, xzDistanceInches, xzDistanceAmountTextAnchor, '"')
 
     # Draw angle 1 section
-    angle1BarTopLeft     = (thirdMetricColumnLeftPx,  secondMetricRowTopPx)
-    angle1BarBottomRight = (thirdMetricColumnRightPx, secondMetricRowBottomPx)
-    cv2.rectangle(img, angle1BarTopLeft, angle1BarBottomRight, WHITE_COLOR, -1)
-    cv2.rectangle(img, angle1BarTopLeft, angle1BarBottomRight, BLACK_COLOR)
+    # angle1BarTopLeft     = (thirdMetricColumnLeftPx,  secondMetricRowTopPx)
+    # angle1BarBottomRight = (thirdMetricColumnRightPx, secondMetricRowBottomPx)
+    # cv2.rectangle(img, angle1BarTopLeft, angle1BarBottomRight, WHITE_COLOR, -1)
+    # cv2.rectangle(img, angle1BarTopLeft, angle1BarBottomRight, BLACK_COLOR)
 
     # Draw angle 2 section
-    angle2BarTopLeft     = (thirdMetricColumnLeftPx,  thirdMetricRowTopPx)
-    angle2BarBottomRight = (thirdMetricColumnRightPx, thirdMetricRowBottomPx)
-    cv2.rectangle(img, angle2BarTopLeft, angle2BarBottomRight, WHITE_COLOR, -1)
-    cv2.rectangle(img, angle2BarTopLeft, angle2BarBottomRight, BLACK_COLOR)
+    # angle2BarTopLeft     = (thirdMetricColumnLeftPx,  thirdMetricRowTopPx)
+    # angle2BarBottomRight = (thirdMetricColumnRightPx, thirdMetricRowBottomPx)
+    # cv2.rectangle(img, angle2BarTopLeft, angle2BarBottomRight, WHITE_COLOR, -1)
+    # cv2.rectangle(img, angle2BarTopLeft, angle2BarBottomRight, BLACK_COLOR)
 
     cv2.imshow('dashboard', img)
 
