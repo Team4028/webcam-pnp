@@ -40,13 +40,14 @@ while(True):
             cv2.findChessboardCorners(grayImg, numChessboardCornersPair, None, cv2.CALIB_CB_FAST_CHECK)
 
         if isChessboardFoundInImg:
-            idkSomeReturnValue, rotationVector, translationVector = \
+            isPnpSuccessful, rotationVector, translationVector = \
                 cv2.solvePnP(chessboardPoints3dList, chessboardCorner2dList, cameraMatrix, distortionCoefficients)
+
+            if not isPnpSuccessful:
+                print('PnP failed!!')
 
             rotationVector    = rotationVector.squeeze()
             translationVector = translationVector.squeeze()
-    
-            assert idkSomeReturnValue
 
             # See opencv docs for Rodrigues for formatting of rotation matrix
             rotationMatrix, _ = cv2.Rodrigues(rotationVector)
