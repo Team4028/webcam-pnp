@@ -177,18 +177,6 @@ def drawPnpDashboard(translationVector, rotationVector):
     drawMetricLabel(img, 'XZ distance:', xzDistanceLabelTextAnchor)
     drawAmountLabel(img, xzDistanceInches, xzDistanceAmountTextAnchor, '"')
 
-    # Draw angle 1 section
-    # angle1BarTopLeft     = (thirdMetricColumnLeftPx,  secondMetricRowTopPx)
-    # angle1BarBottomRight = (thirdMetricColumnRightPx, secondMetricRowBottomPx)
-    # cv2.rectangle(img, angle1BarTopLeft, angle1BarBottomRight, WHITE_COLOR, -1)
-    # cv2.rectangle(img, angle1BarTopLeft, angle1BarBottomRight, BLACK_COLOR)
-
-    # Draw angle 2 section
-    # angle2BarTopLeft     = (thirdMetricColumnLeftPx,  thirdMetricRowTopPx)
-    # angle2BarBottomRight = (thirdMetricColumnRightPx, thirdMetricRowBottomPx)
-    # cv2.rectangle(img, angle2BarTopLeft, angle2BarBottomRight, WHITE_COLOR, -1)
-    # cv2.rectangle(img, angle2BarTopLeft, angle2BarBottomRight, BLACK_COLOR)
-
     cv2.imshow('dashboard', img)
 
     
