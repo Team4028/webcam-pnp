@@ -4,3 +4,5 @@ This project demonstrates the Perspective-n-Point (PnP) algorithm for finding a 
 
 For more information on PnP:
 https://en.wikipedia.org/wiki/Perspective-n-Point
+
+This project also contains calibration data for the Logitech Quickcam Pro 9000. Using this calibration with other cameras is likely to result in unreliable measurements.
